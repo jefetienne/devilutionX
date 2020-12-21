@@ -5,6 +5,9 @@
  */
 #include "all.h"
 
+#define DEATH_DROPHALFGOLD
+//#define DEATH_DROPEQUIPMENT
+
 DEVILUTION_BEGIN_NAMESPACE
 
 int plr_lframe_size;
@@ -1925,12 +1928,14 @@ void StartPlayerKill(int pnum, int earflag)
 	SetPlayerHitPoints(pnum, 0);
 	p->_pVar8 = 1;
 
+#ifdef DEATH_DROPEQUIPMENT
 	if (pnum != myplr && !earflag && !diablolevel) {
 		for (i = 0; i < NUM_INVLOC; i++) {
 			p->InvBody[i]._itype = ITYPE_NONE;
 		}
 		CalcPlrInv(pnum, FALSE);
 	}
+#endif
 
 	if (plr[pnum].plrlevel == currlevel) {
 		FixPlayerLocation(pnum, p->_pdir);
@@ -1942,13 +1947,17 @@ void StartPlayerKill(int pnum, int earflag)
 			drawhpflag = TRUE;
 			deathdelay = 30;
 
+#ifdef DEATH_DROPEQUIPMENT
 			if (pcurs >= CURSOR_FIRSTITEM) {
 				PlrDeadItem(pnum, &p->HoldItem, 0, 0);
 				SetCursor_(CURSOR_HAND);
 			}
+#endif
 
 			if (!diablolevel) {
+#ifdef DEATH_DROPHALFGOLD
 				DropHalfPlayersGold(pnum);
+#endif
 				if (earflag != -1) {
 					if (earflag != 0) {
 						SetPlrHandItem(&ear, IDI_EAR);
@@ -1973,6 +1982,7 @@ void StartPlayerKill(int pnum, int earflag)
 							PlrDeadItem(pnum, &ear, 0, 0);
 						}
 					} else {
+#ifdef DEATH_DROPEQUIPMENT
 						pi = &p->InvBody[0];
 						i = NUM_INVLOC;
 						while (i--) {
@@ -1982,6 +1992,7 @@ void StartPlayerKill(int pnum, int earflag)
 						}
 
 						CalcPlrInv(pnum, FALSE);
+#endif
 					}
 				}
 			}
